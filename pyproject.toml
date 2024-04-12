@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "discordconnectionsexample"
+version = "0.1.0"
+description = "Simple how-to for DiscordConnections package (https://github.com/imPDA/DiscordConnections)"
+authors = ["Dmitry Patrushev <impda@mail.ru>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.1"
+uvicorn = "^0.29.0"
+django-environ = "^0.11.2"
+discord-connections = {git = "https://github.com/imPDA/DiscordConnections.git", rev = "latest"}
+
+[tool.poetry.group.bot_application.dependencies]
+discord-py = "^2.3.2"
+ezcord = "^0.6.2"
+
