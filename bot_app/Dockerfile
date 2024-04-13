@@ -10,9 +10,9 @@ RUN apt-get update && \
 
 COPY pyproject.toml .
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-root --no-interaction --no-ansi
+    poetry install --only bot_application --no-root --no-interaction --no-ansi
 
-COPY ./app /app
+COPY ./bot_app /app
 
 WORKDIR /app
 ENV PYTHONPATH "${PYTHONPATH}:/app"
