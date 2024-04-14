@@ -1,36 +1,42 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, HTTPException, BackgroundTasks
 from fastapi.requests import Request
-from fastapi.responses import Response, RedirectResponse
+from fastapi.responses import RedirectResponse
 from punq import Container
 
-from discord_connections import Client
+from discord_connections import Client, DiscordToken
 
+from application.api.auth.schemas import AuthCallbackSchema
+from application.api.schemas import ErrorSchema
 from domain.entities.tokens import Token
+from domain.entities.users import User
 from infra.repositories.tokens.base import BaseTokensRepository
+from infra.repositories.users.base import BaseUsersRepository
 from init import init_container
+from logic.commands.tokens import handle_discord_code
 
 router = APIRouter(tags=['Auth'])
 
 
-# TODO: response_model ResponseSchema
-@router.get('/callback', status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+@router.get(
+    '/callback',
+    description='Callback for Discord OAuth2 authentication.',
+    status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {'model': ErrorSchema},
+        status.HTTP_403_FORBIDDEN: {'model': ErrorSchema}
+    }
+)
 async def auth_callback_handler(
-    request: Request, code: str, state: str,
-    container: Container = Depends(init_container)
-):
+    request: Request,
+    background_tasks: BackgroundTasks,
+    schema: AuthCallbackSchema = Depends(),
+) -> RedirectResponse:
     saved_state = request.cookies.get('state')
-    if not (saved_state or state) or state != saved_state:
-        # log error
-        return Response(status_code=status.HTTP_403_FORBIDDEN)
 
-    connections_client: Client = container.resolve(Client)
-    token = await connections_client.get_oauth_token(code)
+    if not (saved_state or schema.state) or schema.state != saved_state:
+        # TODO log error
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail={'error': 'Invalid status.'})
 
-    tokens_repository: BaseTokensRepository = container.resolve(BaseTokensRepository)
-    await tokens_repository.add_token(Token(
-        access_token=token.access_token,
-        refresh_token=token.refresh_token,
-        expires_at=token.expires_at
-    ))
+    background_tasks.add_task(handle_discord_code, code=schema.code)
 
     return RedirectResponse('https://discord.com/app')

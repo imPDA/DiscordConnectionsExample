@@ -9,3 +9,7 @@ class BaseTokensRepository(ABC):
     @abstractmethod
     async def add_token(self, token: Token) -> None:
         ...
+
+    @abstractmethod
+    async def get_token_by_oid(self, oid: str) -> Token:
+        ...

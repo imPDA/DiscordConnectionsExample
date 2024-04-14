@@ -9,6 +9,8 @@ from infra.repositories.tokens.mongo import MongoDBTokensRepository
 
 from discord_connections import Client as ConnectionsClient
 
+from infra.repositories.users.base import BaseUsersRepository
+from infra.repositories.users.mongo import MongoDBUsersRepository
 from settings.settings import Settings
 
 
@@ -40,6 +42,15 @@ def _init_container() -> Container:
         )
 
     container.register(BaseTokensRepository, factory=init_tokens_mongodb_repository, scope=Scope.singleton)
+
+    def init_users_mongodb_repository() -> BaseUsersRepository:
+        return MongoDBUsersRepository(
+            mongo_db_client=client,
+            mongo_db_db_name=settings.mongo_db.db_name,
+            mongo_db_collection_name=settings.mongo_db.users_collection_name,
+        )
+
+    container.register(BaseUsersRepository, factory=init_users_mongodb_repository, scope=Scope.singleton)
 
     def create_connections_client() -> ConnectionsClient:
         return ConnectionsClient(

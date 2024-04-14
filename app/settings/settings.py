@@ -11,6 +11,7 @@ class MongoDBSettings(BaseModel):
     password: int = env.str("MONGO_DB_PASSWORD")
     db_name: str = env.str("MONGO_DB_DB_NAME")
     tokens_collection_name: str = env.str("MONGO_DB_TOKENS_COLLECTION_NAME")
+    users_collection_name: str = env.str("MONGO_DB_USERS_COLLECTION_NAME")
 
     @property
     def connection_uri(self) -> str:
