@@ -4,6 +4,8 @@ from punq import Container, Scope
 from motor.motor_asyncio import AsyncIOMotorClient
 from motor.core import AgnosticClient
 
+from infra.message_brokers.base import BaseMessageBroker
+from infra.message_brokers.kafka import KafkaMessageBroker
 from infra.repositories.tokens.base import BaseTokensRepository
 from infra.repositories.tokens.mongo import MongoDBTokensRepository
 
@@ -61,5 +63,11 @@ def _init_container() -> Container:
         )
 
     container.register(ConnectionsClient, factory=create_connections_client, scope=Scope.singleton)
+
+    container.register(
+        BaseMessageBroker,
+        instance=KafkaMessageBroker(bootstrap_server=settings.kafka_url),
+        scope=Scope.singleton
+    )
 
     return container

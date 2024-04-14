@@ -14,8 +14,10 @@ django-environ = "^0.11.2"
 discord-connections = {git = "https://github.com/imPDA/DiscordConnections.git", rev = "latest"}
 motor = "^3.4.0"
 punq = "^0.7.0"
+aiokafka = "^0.10.0"
 
 [tool.poetry.group.bot_application.dependencies]
 discord-py = "^2.3.2"
 ezcord = "^0.6.2"
 django-environ = "^0.11.2"
+aiokafka = "^0.10.0"

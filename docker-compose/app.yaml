@@ -14,6 +14,7 @@ services:
     ports:
       - ${API_PORT}:8000
     networks:
+      - backend
       - db
   bot:
     container_name: bot
@@ -25,8 +26,12 @@ services:
       ../.env
     volumes:
       - ../bot_app:/app
+    networks:
+      - backend
 
 
 networks:
   db:
     external: true
+  backend:
+    driver: bridge

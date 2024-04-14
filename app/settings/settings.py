@@ -27,3 +27,5 @@ class Settings(BaseModel):
     linked_roles_uri: str = env.str("LINKED_ROLES_URL")
 
     mongo_db: MongoDBSettings = MongoDBSettings()
+
+    kafka_url: str = env.str("KAFKA_URL")
