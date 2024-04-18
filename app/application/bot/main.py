@@ -5,9 +5,7 @@ from typing import Literal
 import discord
 import ezcord
 
-import environ
 from aiokafka import AIOKafkaProducer
-from aiokafka.errors import KafkaConnectionError
 from discord import app_commands, Interaction
 from discord.app_commands import AppCommand
 from punq import Container
@@ -51,11 +49,7 @@ class CommandsCog(ezcord.Cog):
         )
 
     async def cog_load(self) -> None:
-        try:
-            await self.producer.start()
-        except KafkaConnectionError:
-            await asyncio.sleep(10)
-            await self.producer.start()
+        await self.producer.start()
 
     async def cog_unload(self) -> None:
         await self.producer.stop()

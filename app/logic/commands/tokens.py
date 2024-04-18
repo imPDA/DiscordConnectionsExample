@@ -10,7 +10,7 @@ from logic.commands.users import create_user_from_token
 async def handle_discord_code(code: str) -> None:
     container: Container = init_container()
     connections_client: Client = container.resolve(Client)
-    token = await connections_client.get_oauth_token(code)
+    token = await connections_client.get_token(code)
 
     tokens_repository: BaseTokensRepository = container.resolve(BaseTokensRepository)
     token = Token(

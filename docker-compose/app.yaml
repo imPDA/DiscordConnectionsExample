@@ -17,7 +17,8 @@ services:
       - backend
       - db
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
   bot:
     container_name: bot
     build:
@@ -31,7 +32,8 @@ services:
     networks:
       - backend
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
   updater:
     container_name: updater
     build:
@@ -46,11 +48,13 @@ services:
       - backend
       - db
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
+
 
 
 networks:
   db:
     external: true
   backend:
-    driver: bridge
+    external: true

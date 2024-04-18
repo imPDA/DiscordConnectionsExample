@@ -1,7 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
 
-from aiokafka.errors import KafkaConnectionError
 from fastapi import FastAPI
 
 from application.api.auth.handlers import router as auth_router
@@ -17,18 +16,8 @@ async def lifespan(app: FastAPI):
     message_broker: KafkaMessageBroker = container.resolve(BaseMessageBroker)
 
     # start producer and consumer on startup
-    # TODO: can retry automatically?
-    try:
-        await message_broker.producer.start()
-    except KafkaConnectionError:
-        await asyncio.sleep(10)
-        await message_broker.producer.start()
-
-    try:
-        await message_broker.consumer.start()
-    except KafkaConnectionError:
-        await asyncio.sleep(10)
-        await message_broker.consumer.start()
+    await message_broker.producer.start()
+    await message_broker.consumer.start()
 
     # run consumer in different task. Ideally - move to a separate container
     asyncio.create_task(message_broker.consume())

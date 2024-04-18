@@ -1,7 +1,6 @@
 import asyncio
 
 from aiokafka import AIOKafkaConsumer, TopicPartition
-from aiokafka.errors import KafkaConnectionError
 from discord_connections import Client as ConnectionsClient
 from discord_connections.datatypes import Token as DiscordToken
 from pydantic import ValidationError
@@ -30,11 +29,7 @@ async def main():
     metadata_repository: BaseMetadataRepository = container.resolve(BaseMetadataRepository)
     connections_client: ConnectionsClient = container.resolve(ConnectionsClient)
 
-    try:
-        await consumer.start()
-    except KafkaConnectionError:
-        await asyncio.sleep(10)
-        await consumer.start()
+    await consumer.start()
 
     try:
         async for msg in consumer:
