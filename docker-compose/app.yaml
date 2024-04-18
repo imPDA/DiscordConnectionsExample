@@ -16,18 +16,37 @@ services:
     networks:
       - backend
       - db
+    depends_on:
+      - kafka
   bot:
     container_name: bot
     build:
       context: ..
-      dockerfile: ./bot_app/Dockerfile
-    command: "python3 main.py"
+      dockerfile: Dockerfile
+    command: "python3 ./application/bot/main.py"
     env_file:
       ../.env
     volumes:
-      - ../bot_app:/app
+      - ../app:/app
     networks:
       - backend
+    depends_on:
+      - kafka
+  updater:
+    container_name: updater
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    command: "python3 application/updater/main.py"
+    env_file:
+      ../.env
+    volumes:
+      - ../app:/app
+    networks:
+      - backend
+      - db
+    depends_on:
+      - kafka
 
 
 networks:

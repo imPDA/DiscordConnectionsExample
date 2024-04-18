@@ -5,7 +5,7 @@ from logic.exceptions.base import LogicError
 
 
 @dataclass
-class UserAlreadyExistsError(LogicError):
+class UserWithThatDiscordUserIDAlreadyExistsError(LogicError):
     existing_user: User
 
     @property

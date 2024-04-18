@@ -4,7 +4,7 @@ from typing import Mapping, Any
 from domain.entities.tokens import Token
 
 
-def convert_token_document_to_entity(token_document: Mapping[str, Any]):
+def convert_token_document_to_entity(token_document: Mapping[str, Any]) -> Token:
     return Token(
         oid=token_document['oid'],
         access_token=token_document['access_token'],
@@ -13,7 +13,7 @@ def convert_token_document_to_entity(token_document: Mapping[str, Any]):
     )
 
 
-def convert_token_entity_to_document(token: Token):
+def convert_token_entity_to_document(token: Token) -> Mapping[str, Any]:
     return {
         'oid': token.oid,
         'access_token': token.access_token,

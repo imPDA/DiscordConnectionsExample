@@ -8,7 +8,7 @@ from domain.entities.users import User
 @dataclass
 class BaseUsersRepository(ABC):
     @abstractmethod
-    async def add_user(self, token: User) -> None:
+    async def add_user(self, user: User) -> None:
         ...
 
     @abstractmethod

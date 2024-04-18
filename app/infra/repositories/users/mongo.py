@@ -7,7 +7,7 @@ from infra.repositories.users.base import BaseUsersRepository
 from infra.repositories.users.converters import (
     convert_user_entity_to_document, convert_user_document_to_entity
 )
-from logic.exceptions.exceptions import UserAlreadyExistsError
+from logic.exceptions.exceptions import UserWithThatDiscordUserIDAlreadyExistsError
 
 
 @dataclass
@@ -15,7 +15,7 @@ class MongoDBUsersRepository(BaseUsersRepository, BaseMongoDBRepository):
     async def add_user(self, user: User) -> None:
         existing_user = await self.find_user_by_discord_user_id(user.discord_user_id)
         if existing_user:
-            raise UserAlreadyExistsError(existing_user)
+            raise UserWithThatDiscordUserIDAlreadyExistsError(existing_user)
 
         await self._collection.insert_one(convert_user_entity_to_document(user))
 

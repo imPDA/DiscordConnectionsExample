@@ -1,17 +1,9 @@
 from fastapi import APIRouter, status, Depends, HTTPException, BackgroundTasks
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
-from punq import Container
-
-from discord_connections import Client, DiscordToken
 
 from application.api.auth.schemas import AuthCallbackSchema
 from application.api.schemas import ErrorSchema
-from domain.entities.tokens import Token
-from domain.entities.users import User
-from infra.repositories.tokens.base import BaseTokensRepository
-from infra.repositories.users.base import BaseUsersRepository
-from init import init_container
 from logic.commands.tokens import handle_discord_code
 
 router = APIRouter(tags=['Auth'])

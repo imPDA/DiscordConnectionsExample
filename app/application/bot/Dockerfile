@@ -1,3 +1,5 @@
+# It is not in use actually
+
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -12,7 +14,7 @@ COPY pyproject.toml .
 RUN poetry config virtualenvs.create false && \
     poetry install --only bot_application --no-root --no-interaction --no-ansi
 
-COPY ./bot_app /app
+COPY ./app /app
 
 WORKDIR /app
 ENV PYTHONPATH "${PYTHONPATH}:/app"

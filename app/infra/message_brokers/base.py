@@ -1,19 +1,14 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import TypeVar, Generic
-
-MP = TypeVar('MP')
-MC = TypeVar('MC')
+from dataclasses import dataclass
+from typing import List, Dict
 
 
 @dataclass
-class BaseMessageBroker(ABC, Generic[MP, MC]):
-    producer: MP = field(init=False)
-    consumer: MC = field(init=False)
-
+class BaseMessageBroker(ABC):
     @abstractmethod
-    async def send_message(self, topic: str, value: bytes) -> None:
+    async def send_message(self, topic: str, value: bytes, key: bytes) -> None:
         ...
 
-    async def consume(self) -> bytes:
+    @abstractmethod
+    async def consume(self) -> List[Dict]:
         ...

@@ -1,50 +1,28 @@
-import asyncio
+import json
 from dataclasses import dataclass
-from typing import List
 
-from aiokafka import AIOKafkaProducer, AIOKafkaConsumer, ConsumerRecord
+from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 
 from infra.message_brokers.base import BaseMessageBroker
+from logic.commands.metadata import handle_new_metadata
 
 
 @dataclass
-class KafkaMessageBroker(BaseMessageBroker[AIOKafkaProducer, AIOKafkaConsumer]):
-    bootstrap_server: str
+class KafkaMessageBroker(BaseMessageBroker):
+    producer: AIOKafkaProducer
+    consumer: AIOKafkaConsumer
 
-    def __post__init__(self):
-        self.producer = AIOKafkaProducer(bootstrap_servers=self.bootstrap_server)
-        self.consumer = AIOKafkaConsumer('test', bootstrap_servers=self.bootstrap_server)
+    async def send_message(self, topic: str, key: bytes, value: bytes) -> None:
+        await self.producer.send_and_wait(topic=topic, value=value, key=key)
 
-    # TODO: how and then to start the broker?
-    # async def start(self) -> None:
-    #     await self.producer.start()
-    #     await self.consumer.start()
-
-    async def send_message(self, topic: str, value: bytes) -> None:
-        await self.producer.start()  # TODO: refactor later
-        await self.producer.send_and_wait(topic=topic, value=value)
-
-    async def consume(self) -> List[ConsumerRecord]:
-        await self.consumer.start()  # TODO: refactor later
-
-        records = []
-
+    async def consume(self) -> None:
         async for msg in self.consumer:
-            print(f"{msg.topic}:{msg.partition:d}:{msg.offset:d}: {msg.key=} {msg.value=} {msg.timestamp=}")
-            records.append(msg)
-
-        return records
-
-    async def stop(self) -> None:
-        await self.producer.stop()
-        await self.consumer.stop()
-
-    def __del__(self) -> None:
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                loop.create_task(self.stop())
-            else:
-                loop.run_until_complete(self.stop())
-        except Exception:
-            pass
+            print(f"{msg.topic}:{msg.partition}:{msg.offset}: key={msg.key}"
+                  f" value={msg.value} timestamp_ms={msg.timestamp}")
+            try:
+                await handle_new_metadata(
+                    metadata=json.loads(msg.value.decode()),
+                    discord_user_id=int(msg.key.decode())
+                )
+            except Exception as e:
+                print(f"Error occurred during message consuming: {e}")
